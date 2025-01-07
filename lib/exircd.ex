@@ -1,3 +1,2 @@
 defmodule Exircd do
-
 end

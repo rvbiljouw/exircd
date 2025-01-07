@@ -48,7 +48,8 @@ defmodule Exircd.Channels do
   # Server Callbacks
   @impl true
   def init(_) do
-    {:ok, %{}}  # channel_name => channel_data
+    # channel_name => channel_data
+    {:ok, %{}}
   end
 
   @impl true
@@ -115,6 +116,7 @@ defmodule Exircd.Channels do
   def handle_call(:clear, _from, _state) do
     Registry.keys(@registry, self())
     |> Enum.each(&Registry.unregister(@registry, &1))
+
     {:reply, :ok, %{}}
   end
 

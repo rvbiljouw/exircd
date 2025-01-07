@@ -5,6 +5,7 @@ defmodule Exircd.ChannelsTest do
 
   setup do
     Users.start_link()
+
     case Channels.start_link([]) do
       {:ok, _pid} -> :ok
       {:error, {:already_started, _pid}} -> :ok

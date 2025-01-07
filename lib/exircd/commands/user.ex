@@ -1,7 +1,9 @@
 defmodule Exircd.Commands.User do
   @server_version "0.1.0"
-  @user_modes "i"        # i = invisible
-  @channel_modes "itkl"  # i = invite-only, t = topic protection, k = key, l = limit
+  # i = invisible
+  @user_modes "i"
+  # i = invite-only, t = topic protection, k = key, l = limit
+  @channel_modes "itkl"
 
   def execute(socket, _sender, [username, _mode, _unused | realname_parts]) do
     # Combine all remaining parts as realname (might start with *)
@@ -21,12 +23,14 @@ defmodule Exircd.Commands.User do
         case Exircd.Users.register(socket, nickname, username, realname, servername) do
           {:ok, user} ->
             Exircd.Sessions.update(socket, :registered, true)
+
             :gen_tcp.send(socket, """
             :server 001 #{user.nickname} :Welcome to the IRC Network
             :server 002 #{user.nickname} :Your host is #{servername}, running Exircd
             :server 003 #{user.nickname} :This server was created #{user.registered_at}
             :server 004 #{user.nickname} #{servername} #{@server_version} #{@user_modes} #{@channel_modes}\r\n
             """)
+
             {:ok, user}
 
           {:error, :nickname_in_use} ->

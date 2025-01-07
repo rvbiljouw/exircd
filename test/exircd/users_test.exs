@@ -7,11 +7,13 @@ defmodule Exircd.UsersTest do
       {:ok, _} -> :ok
       {:error, {:already_started, _}} -> :ok
     end
+
     :ok
   end
 
   test "register/5 creates a new user" do
-    socket = make_ref() # Mock socket for testing
+    # Mock socket for testing
+    socket = make_ref()
     assert {:ok, user} = Users.register(socket, "tester", "test", "Test User", "test.server")
     assert user.nickname == "tester"
     assert user.username == "test"

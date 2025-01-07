@@ -10,7 +10,7 @@ defmodule Exircd.Commands.Mode.ChannelMode do
 
   def execute(socket, _sender, ["#" <> _channel = channel | mode_args]) do
     with {:ok, _user} <- Exircd.Users.get_user_by_socket(socket) do
-        handle_channel_mode(socket, channel, mode_args)
+      handle_channel_mode(socket, channel, mode_args)
     end
   end
 

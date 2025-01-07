@@ -15,7 +15,10 @@ defmodule Exircd.Commands.Who do
         handle_user_who(socket, requesting_user, target)
       end
 
-      :gen_tcp.send(socket, ":#{server_name()} 315 #{requesting_user.nickname} #{target} :End of WHO list\r\n")
+      :gen_tcp.send(
+        socket,
+        ":#{server_name()} 315 #{requesting_user.nickname} #{target} :End of WHO list\r\n"
+      )
     end
   end
 
@@ -41,6 +44,7 @@ defmodule Exircd.Commands.Who do
     case Users.get_user(mask) do
       {:ok, target_user} ->
         send_who_reply(socket, requesting_user, target_user, "*")
+
       _ ->
         :ok
     end
@@ -49,8 +53,9 @@ defmodule Exircd.Commands.Who do
   defp send_who_reply(socket, requesting_user, target_user, channel) do
     flags = if is_operator?(target_user), do: "H*", else: "H"
 
-    reply = ":#{server_name()} 352 #{requesting_user.nickname} #{channel} #{target_user.username} " <>
-            "#{target_user.hostname} #{server_name()} #{target_user.nickname} #{flags} :0 #{target_user.realname}\r\n"
+    reply =
+      ":#{server_name()} 352 #{requesting_user.nickname} #{channel} #{target_user.username} " <>
+        "#{target_user.hostname} #{server_name()} #{target_user.nickname} #{flags} :0 #{target_user.realname}\r\n"
 
     :gen_tcp.send(socket, reply)
   end

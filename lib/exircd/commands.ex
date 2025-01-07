@@ -34,7 +34,11 @@ defmodule Exircd.Commands do
         :gen_tcp.send(socket, ":server 401 * #{nickname} :No such nick\r\n")
 
       {:ok, user} ->
-        :gen_tcp.send(socket, ":server 311 * #{user.nickname} #{user.username} localhost * :#{user.realname}\r\n")
+        :gen_tcp.send(
+          socket,
+          ":server 311 * #{user.nickname} #{user.username} localhost * :#{user.realname}\r\n"
+        )
+
         :gen_tcp.send(socket, ":server 318 * #{nickname} :End of /WHOIS list\r\n")
     end
   end

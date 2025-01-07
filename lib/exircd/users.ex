@@ -28,6 +28,7 @@ defmodule Exircd.Users do
     case Registry.lookup(@registry, String.downcase(nickname)) do
       [{_pid, user}] ->
         {:ok, user}
+
       [] ->
         {:error, :user_not_found}
     end
@@ -35,14 +36,17 @@ defmodule Exircd.Users do
 
   def get_user_by_socket(socket) do
     @registry
-    |> Registry.select([{
-      {:"$1", :_, :"$2"},
-      [{:==, {:map_get, :socket, :"$2"}, {:const, socket}}],
-      [:"$2"]
-    }])
+    |> Registry.select([
+      {
+        {:"$1", :_, :"$2"},
+        [{:==, {:map_get, :socket, :"$2"}, {:const, socket}}],
+        [:"$2"]
+      }
+    ])
     |> case do
       [user] ->
         {:ok, user}
+
       [] ->
         {:error, :not_registered}
     end
@@ -50,11 +54,13 @@ defmodule Exircd.Users do
 
   def broadcast(message, exclude_socket \\ nil) do
     @registry
-    |> Registry.select([{
-      {:"$1", :"$2", %{socket: :"$3"}},
-      [],
-      [:"$3"]
-    }])
+    |> Registry.select([
+      {
+        {:"$1", :"$2", %{socket: :"$3"}},
+        [],
+        [:"$3"]
+      }
+    ])
     |> Enum.each(fn socket ->
       if socket != exclude_socket do
         :gen_tcp.send(socket, message)
@@ -64,14 +70,17 @@ defmodule Exircd.Users do
 
   def remove_user(socket) do
     @registry
-    |> Registry.select([{
-      {:"$1", :"$2", %{socket: socket}},
-      [],
-      [:"$1"]
-    }])
+    |> Registry.select([
+      {
+        {:"$1", :"$2", %{socket: socket}},
+        [],
+        [:"$1"]
+      }
+    ])
     |> case do
       [nickname] ->
         Registry.unregister(@registry, nickname)
+
       [] ->
         :ok
     end

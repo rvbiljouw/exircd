@@ -57,10 +57,11 @@ defmodule Exircd.Sessions do
   end
 
   def handle_call({:update, socket, key, value}, _from, state) do
-    new_state = update_in(state, [socket], fn session ->
-      session = session || %{}
-      Map.put(session, key, value)
-    end)
+    new_state =
+      update_in(state, [socket], fn session ->
+        session = session || %{}
+        Map.put(session, key, value)
+      end)
 
     {:reply, :ok, new_state}
   end
@@ -71,7 +72,13 @@ defmodule Exircd.Sessions do
 
   def handle_call({:try_register, socket}, _from, state) do
     case Map.get(state, socket) do
-      %{nickname: nickname, username: username, realname: realname, servername: servername, registered: false} ->
+      %{
+        nickname: nickname,
+        username: username,
+        realname: realname,
+        servername: servername,
+        registered: false
+      } ->
         case Exircd.Users.register(socket, nickname, username, realname, servername) do
           {:ok, user} ->
             new_state = put_in(state[socket][:registered], true)
@@ -90,21 +97,23 @@ defmodule Exircd.Sessions do
   end
 
   def handle_call({:update_modes, socket, :add, modes}, _from, state) do
-    new_state = update_in(state, [socket, :modes], fn current_modes ->
-      modes
-      |> String.graphemes()
-      |> Enum.reduce(current_modes, &MapSet.put(&2, &1))
-    end)
+    new_state =
+      update_in(state, [socket, :modes], fn current_modes ->
+        modes
+        |> String.graphemes()
+        |> Enum.reduce(current_modes, &MapSet.put(&2, &1))
+      end)
 
     {:reply, :ok, new_state}
   end
 
   def handle_call({:update_modes, socket, :remove, modes}, _from, state) do
-    new_state = update_in(state, [socket, :modes], fn current_modes ->
-      modes
-      |> String.graphemes()
-      |> Enum.reduce(current_modes, &MapSet.delete(&2, &1))
-    end)
+    new_state =
+      update_in(state, [socket, :modes], fn current_modes ->
+        modes
+        |> String.graphemes()
+        |> Enum.reduce(current_modes, &MapSet.delete(&2, &1))
+      end)
 
     {:reply, :ok, new_state}
   end
@@ -113,5 +122,4 @@ defmodule Exircd.Sessions do
   def handle_cast({:remove, socket}, state) do
     {:noreply, Map.delete(state, socket)}
   end
-
 end
